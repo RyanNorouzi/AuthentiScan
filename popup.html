@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AuthentiScan</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="app">
+    <header class="header">
+      <div class="logo">
+        <img src="icon48.png" alt="AuthentiScan" width="26" height="26">
+        <div>
+          <h1>AuthentiScan</h1>
+          <span class="tagline">AI · Deepfake · Fact Checker</span>
+        </div>
+      </div>
+      <label class="theme-switch" id="themeToggle" title="Toggle light/dark mode">
+        <input type="checkbox" id="themeCheckbox">
+        <span class="theme-slider"></span>
+      </label>
+      <div class="tier-badge" id="tierBadge">FREE · FOREVER</div>
+    </header>
+
+    <nav class="tabs">
+      <button class="tab active" data-tab="analyze">Analyze</button>
+      <button class="tab" data-tab="stats">Stats</button>
+      <button class="tab" data-tab="settings">Settings</button>
+    </nav>
+
+    <!-- ==================== Analyze Tab ==================== -->
+    <div class="tab-content active" id="tab-analyze">
+
+      <!-- Video Recording Section -->
+      <div class="section">
+        <div class="section-header">
+          <div>
+            <div class="section-title">Video Deepfake Detection</div>
+            <div class="section-desc">Record your screen to analyze any video for AI manipulation</div>
+          </div>
+        </div>
+        <div style="margin-bottom:10px">
+          <input type="text" id="videoLinkInput" class="video-link-input" placeholder="Optional: paste video URL for cross-checking...">
+        </div>
+
+        <!-- Analysis Focus -->
+        <div class="focus-section">
+          <div class="focus-label">Analysis Focus <span style="color:#4b5e77;font-weight:400">(optional)</span></div>
+          <div class="focus-chips">
+            <button class="focus-chip" data-focus="visual">Visuals</button>
+            <button class="focus-chip" data-focus="audio">Audio</button>
+            <button class="focus-chip" data-focus="face">Faces</button>
+            <button class="focus-chip" data-focus="color">Colors</button>
+            <button class="focus-chip" data-focus="motion">Motion</button>
+            <button class="focus-chip" data-focus="text">Text/Font</button>
+          </div>
+          <input type="text" id="focusNotes" class="video-link-input" placeholder="Extra notes: e.g. 'focus on lip sync' or 'check hands closely'..." style="margin-top:6px;font-size:10px">
+        </div>
+
+        <div class="capture-grid">
+          <button class="capture-btn" id="recordFullBtn">
+            
+            <span class="capture-label">Record Screen</span>
+            <span class="capture-hint">Full screen capture</span>
+          </button>
+          <button class="capture-btn" id="recordAreaBtn">
+            
+            <span class="capture-label">Select Area</span>
+            <span class="capture-hint">Draw to record</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Screenshot Section -->
+      <div class="section">
+        <div class="section-header">
+          <div>
+            <div class="section-title">Screenshot Analysis</div>
+            <div class="section-desc">Capture images to check for AI-generated visuals</div>
+          </div>
+        </div>
+        <div class="capture-grid">
+          <button class="capture-btn" id="screenshotFullBtn">
+            
+            <span class="capture-label">Full Screen</span>
+            <span class="capture-hint">Capture entire page</span>
+          </button>
+          <button class="capture-btn" id="screenshotAreaBtn">
+            
+            <span class="capture-label">Select Area</span>
+            <span class="capture-hint">Crop & capture</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Text Analysis Section -->
+      <div class="section">
+        <div class="section-header">
+          <div>
+            <div class="section-title">Text AI Detection</div>
+            <div class="section-desc">Paste any text to detect if it's AI-generated</div>
+          </div>
+        </div>
+        <textarea id="manualInput" placeholder="Paste text here to check if it's AI-generated..." rows="4"></textarea>
+        <button class="btn primary full-width" id="analyzeBtn">Analyze Text</button>
+        <div id="manualResult" class="result-card hidden"></div>
+      </div>
+
+      <!-- Latest Result -->
+      <div class="section" id="latestResultSection" style="display:none">
+        <div class="section-header">
+          <div>
+            <div class="section-title">Latest Result</div>
+          </div>
+        </div>
+        <div id="latestResult" class="result-card"></div>
+      </div>
+    </div>
+
+    <!-- ==================== Stats Tab ==================== -->
+    <div class="tab-content" id="tab-stats">
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-value" id="totalScanned">0</div>
+          <div class="stat-label">Posts Scanned</div>
+        </div>
+        <div class="stat-card accent-red">
+          <div class="stat-value" id="aiDetected">0</div>
+          <div class="stat-label">AI Detected</div>
+        </div>
+        <div class="stat-card accent-green">
+          <div class="stat-value" id="verified">0</div>
+          <div class="stat-label">Verified</div>
+        </div>
+        <div class="stat-card accent-yellow">
+          <div class="stat-value" id="flagged">0</div>
+          <div class="stat-label">Flagged</div>
+        </div>
+      </div>
+
+      <div class="stats-grid" style="margin-top:8px">
+        <div class="stat-card accent-cyan">
+          <div class="stat-value" id="videosAnalyzed">0</div>
+          <div class="stat-label">Videos</div>
+        </div>
+        <div class="stat-card accent-pink">
+          <div class="stat-value" id="deepfakesDetected">0</div>
+          <div class="stat-label">Deepfakes</div>
+        </div>
+      </div>
+
+      <div class="section" style="margin-top:12px">
+        <div class="section-title">AI Content Exposure</div>
+        <div class="progress-bar" style="margin-top:8px">
+          <div class="progress-fill" id="aiPercentBar" style="width: 0%"></div>
+        </div>
+        <div class="progress-label">
+          <span id="aiPercent">0%</span> of scanned content appears AI-generated
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-title">Most Suspicious</div>
+        <div id="suspiciousList" class="suspicious-list">
+          <div class="empty-state">No suspicious content detected yet.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==================== Settings Tab ==================== -->
+    <div class="tab-content" id="tab-settings">
+      <div class="setting-row">
+        <div>
+          <div class="setting-label">Auto-Scan Posts</div>
+          <div class="setting-desc">Automatically analyze posts as you browse</div>
+        </div>
+        <label class="toggle">
+          <input type="checkbox" id="autoScan" checked>
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+      <div class="setting-row">
+        <div>
+          <div class="setting-label">Show Badges</div>
+          <div class="setting-desc">Display analysis badges on posts</div>
+        </div>
+        <label class="toggle">
+          <input type="checkbox" id="showBadges" checked>
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+
+      <div class="section" style="margin-top:18px">
+        <div class="section-title">About</div>
+        <div style="font-size:11px;color:#94a3b8;line-height:1.6;padding:8px 0">
+          AuthentiScan is <strong style="color:#67e8f9">100% free</strong> — built for digital literacy and empowering people to think critically about online content.
+        </div>
+      </div>
+
+      <div class="section">
+        <button class="btn danger full-width" id="resetBtn">Reset All Data</button>
+      </div>
+
+      <div class="footer">AuthentiScan v2.1.0 · Built for truth</div>
+    </div>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>
